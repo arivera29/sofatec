@@ -1,0 +1,27 @@
+@CHARSET "ISO-8859-1";
+
+.login {
+	position: absolute;
+	top: 50%; /* Buscamos el centro horizontal (relativo) del navegador */
+	left: 50%; /* Buscamos el centro vertical (relativo) del navegador */
+	width: 350px; /* Definimos el ancho del objeto a centrar */
+	height: 452px; /* Definimos el alto del objeto a centrar */
+	margin-top: -200px; /* Restamos la mitad de la altura del objeto con un margin-top */
+	margin-left: -300px; /* Restamos la mitad de la anchura del objeto con un margin-left */
+	z-index : 1;
+	background-image:url('images/sofatec-inicio.png');
+    background-repeat:no-repeat;
+}
+
+.captura_login
+{
+    position:relative;
+    top: 200px;
+    left: 75px;
+    width : 190px;
+    z-index:2;
+    font-family:Verdana, Arial, Century Gothic;
+    font-size:11px;
+    text-align:left;
+    color:#000b30;
+}

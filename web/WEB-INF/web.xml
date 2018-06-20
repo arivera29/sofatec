@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>movilidad</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  <env-entry>
+    <description>Url Conexion database</description>
+    <env-entry-name>url</env-entry-name>
+    <env-entry-type>java.lang.String</env-entry-type>
+    <env-entry-value>jdbc:mysql://localhost:3306/sofatec</env-entry-value>
+  </env-entry>
+  <env-entry>
+    <description>Usuario de conexion</description>
+    <env-entry-name>user</env-entry-name>
+    <env-entry-type>java.lang.String</env-entry-type>
+    <env-entry-value>root</env-entry-value>
+  </env-entry>
+  <env-entry>
+    <description>Password</description>
+    <env-entry-name>password</env-entry-name>
+    <env-entry-type>java.lang.String</env-entry-type>
+    <env-entry-value>pantera</env-entry-value>
+  </env-entry>
+  <env-entry>
+    <description>controller</description>
+    <env-entry-name>controller</env-entry-name>
+    <env-entry-type>java.lang.String</env-entry-type>
+    <env-entry-value>0</env-entry-value>
+  </env-entry>
+  <env-entry>
+    <description>service</description>
+    <env-entry-name>service</env-entry-name>
+    <env-entry-type>java.lang.String</env-entry-type>
+    <env-entry-value>2020-07-11</env-entry-value>
+  </env-entry>
+</web-app>
