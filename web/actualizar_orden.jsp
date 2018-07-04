@@ -1,3 +1,4 @@
+<%@page import="java.io.File"%>
 <%@page import="com.are.entidades.Camp"%>
 <%@page import="com.are.manejadores.ManejadorCamp"%>
 <%@page import="com.are.sofatec.db"%>
@@ -13,7 +14,7 @@
             + " BRIGADA,R1.RECUNOMB AS NOMB_BRIGADA, ID_CAMP,CAMPDESC, ZONA,"
             + " ZONANOMB, R2.RECUNOMB AS NOMB_INSPECTOR, R3.RECUNOMB AS NOMB_INGENIERO, "
             + " FECHA_CARGA, USUARIO_CARGA, CORRIENTE1,VOLTAJE1, CORRIENTE2, VOLTAJE2, "
-            + " IRREG, LATITUD_APP, LONGITUD_APP, IMEI_APP"
+            + " IRREG, LATITUD_APP, LONGITUD_APP, IMEI_APP, camp_irreg.DESC_IRREG "
             + " FROM camp_orden "
             + " INNER JOIN contratistas ON CONTRATISTA = CONTCODI "
             + " INNER JOIN recurso R1 ON BRIGADA = R1.RECUCODI "
@@ -21,6 +22,7 @@
             + " INNER JOIN recurso R3 ON INGENIERO = R3.RECUCODI "
             + " INNER JOIN camp ON ID_CAMP = campcodi "
             + " INNER JOIN zonas ON ZONA = zonacodi "
+            + " INNER JOIN camp_irreg ON IRREG = camp_irreg.COD "
             + " WHERE ID = ?";
 
     java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
@@ -49,6 +51,11 @@
     ArrayList<Camp> lista = m1.ListByEstado(1);
 
 
+    sql = "SELECT * FROM camp_orden_fotos WHERE id_orden = ?";
+    java.sql.PreparedStatement pst2 = conexion.getConnection().prepareStatement(sql);
+    pst2.setString(1, rs.getString("ID"));
+    java.sql.ResultSet rsFotos = conexion.Query(pst2);
+    
 %>
 <html>
     <head>
@@ -188,6 +195,14 @@
                     <td><%= rs.getString("CORRIENTE2")%> / <%= rs.getString("VOLTAJE2")%></td>
                 </tr>
                 <tr>
+                    <td>Irregularidad</td>
+                    <td><%= rs.getString("DESC_IRREG") %></td>
+                </tr>
+                <tr>
+                    <td>Observacion</td>
+                    <td><%= String.format("%s V1:%s I1:%s V2:%s I2:%s %s",rs.getString("DESC_IRREG"),rs.getString("VOLTAJE1"), rs.getString("CORRIENTE1"), rs.getString("VOLTAJE2"), rs.getString("CORRIENTE2"),rs.getString("CONTNOMB")) %>  </td>
+                </tr>
+                <tr>
                     <td>Latitud/Longitud</td>
                     <td><%= rs.getString("LATITUD_APP")%> / <%= rs.getString("LONGITUD_APP")%> <a href="mapa.jsp?lat=<%= rs.getString("LATITUD_APP")%>&lon=<%= rs.getString("LONGITUD_APP")%>" target="_blank" >Ver mapa</a></td>
                 </tr>
@@ -241,6 +256,19 @@
 
 
             <% }  %>
+            
+            <div id="fotos">
+                <h2>Fotos</h2>
+                <% while (rsFotos.next())  {  %>
+                <%  
+                    File file = new File(rsFotos.getString("path"));
+                    String filename = "imagenes/" + file.getName();
+                %>
+                <img src="<%= filename %>">
+                
+                <% } %>
+            </div>
+            
         </div>
 
     </body>
