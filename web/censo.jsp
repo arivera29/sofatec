@@ -87,7 +87,7 @@
     if (request.getParameter("orden") != null) {
         String orden = (String) request.getParameter("orden");
 
-        String sql = "SELECT NUM_ACTA, NOMBRE_OPERARIO_HDA, FECHA_CENSO, NUM_CT, NUM_MT FROM QO_ORDENES WHERE NUM_OS=?";
+        String sql = "SELECT NUM_ACTA, NOMBRE_OPERARIO_HDA, FECHA_CENSO, NUM_CT, NUM_MT,CIUU,TARIFA FROM QO_ORDENES WHERE NUM_OS=?";
         java.sql.PreparedStatement pst4 = conexion.getConnection().prepareStatement(sql);
         pst4.setString(1, orden);
         rsOrden = conexion.Query(pst4);
@@ -201,7 +201,7 @@
                         <select name="tarifa" id="tarifa" >
                             <option value="">Seleccionar</option>
                             <% while (rsTarifas.next()) {%>
-                            <option value="<%= rsTarifas.getString("COD_TAR")%>"><%= rsTarifas.getString("DESC_TAR")%></option>
+                            <option value="<%= rsTarifas.getString("COD_TAR")%>" <%= rsTarifas.getString("COD_TAR").equals(rsOrden.getString("TARIFA"))?"selected":""  %>><%= rsTarifas.getString("DESC_TAR")%></option>
 
                             <% }  %>
 
@@ -214,7 +214,7 @@
                         <select name="ciuu" id="ciuu" >
                             <option value="">Seleccionar</option>
                             <% while (rsCIUU.next()) {%>
-                            <option value="<%= rsCIUU.getString("COD_CIUU")%>"><%= rsCIUU.getString("DESC_CIUU")%></option>
+                            <option value="<%= rsCIUU.getString("COD_CIUU")%>" <%= rsCIUU.getString("COD_CIUU").equals(rsOrden.getString("CIUU"))?"selected":""  %> ><%= rsCIUU.getString("DESC_CIUU")%></option>
 
                             <% }%>
 

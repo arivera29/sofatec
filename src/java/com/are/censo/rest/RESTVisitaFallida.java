@@ -30,7 +30,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "RESTVisitaFallida", urlPatterns = {"/visita/fallida"})
 public class RESTVisitaFallida extends HttpServlet {
-
+    
+    private final static Logger LOGGER = Logger.getLogger(RESTVisitaFallida.class.getName());
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -50,6 +51,7 @@ public class RESTVisitaFallida extends HttpServlet {
             VisitaResponse visitaResponse = new VisitaResponse();
             String json = "";
             db conexion = null;
+            LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> Init");
             try {
 
                 StringBuilder sb = new StringBuilder();
@@ -61,34 +63,43 @@ public class RESTVisitaFallida extends HttpServlet {
                 }
 
                 json = sb.toString();
+                
+                LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> Validating struct JSON");
 
                 if (json.equals("")) {
+                    LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> Error... JSON empty!");
                     throw new Exception("Parametro JSON vacio");
                 }
 
                 visita = gson.fromJson(json, VisitaFallidaRequest.class);
 
                 if (visita == null) {
+                    LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> Error... JSON struct no valida!");
                     throw new Exception("JSON no válido");
                 }
 
                 if (visita.getToken().equals("")) {
+                    LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> Error... field token empty");
                     throw new Exception("atributo token no válido");
                 }
 
                 if (visita.getId() == 0) {
+                    LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> Error... field Id empty");
                     throw new Exception("atributo ID no válido");
                 }
 
                 if (visita.getAnomalia().equals("")) {
+                    LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> Error... field anomalia empty");
                     throw new Exception("atributo ANOMALIA no válido");
                 }
 
                 if (visita.getBrigada().equals("")) {
+                    LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> Error... filed brigada empty");
                     throw new Exception("atributo BRIGADA no válido");
                 }
 
                 if (visita.getImei().equals("")) {
+                    LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> Error... field IMEI empty");
                     throw new Exception("atributo IMEI no válido");
                 }
 
@@ -99,9 +110,11 @@ public class RESTVisitaFallida extends HttpServlet {
                         for (Foto foto : visita.getFotos()) {
                             contador++;
                             if (foto.getFilename().equals("")) {
+                                LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> Error... field foto->filename empty. Item {0}", contador);
                                 throw new Exception("atributo FILENAME del listado de fotos no válido. Item " + contador);
                             }
                             if (foto.getStrBase64().equals("")) {
+                                LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> Error... field foto->strBase64 empty. Item {0}", contador);
                                 throw new Exception("atributo STRBASE64 del listado de fotos no válido. Item " + contador);
                             }
                         }
@@ -109,6 +122,18 @@ public class RESTVisitaFallida extends HttpServlet {
                 }else {
                     visita.setFotos(new ArrayList<Foto>());
                 }
+                
+                LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> JSON valid OK!");
+                
+                LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> [JSON] ID .............. {0}", visita.getId());
+                LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> [JSON] TOKEN .............. {0}", visita.getToken());
+                LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> [JSON] ANOMALIA .............. {0}", visita.getAnomalia());
+                LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> [JSON] BRIGADA .............. {0}", visita.getBrigada());
+                LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> [JSON] IMEI .............. {0}", visita.getImei());
+                LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> [JSON] OBSERVACION .............. {0}", visita.getObservacion());
+                
+                LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> Updating visita fallida ID {0}", visita.getId());
+                
                 conexion = new db();
                 CtlVisitas controlador = new CtlVisitas(conexion);
                 controlador.setDirImages(directorio);
@@ -116,10 +141,12 @@ public class RESTVisitaFallida extends HttpServlet {
                     visitaResponse.setError(false);
                     visitaResponse.setMsgError("");
                     visitaResponse.setSync(true);
+                    LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> [JSON] Updated visita fallida ID {0}", visita.getId());
                 } else {
                     visitaResponse.setError(true);
                     visitaResponse.setMsgError("Error al actualizar el registro");
                     visitaResponse.setSync(false);
+                    LOGGER.log(Level.INFO, "[VISITA_FALLIIDA] -> [JSON] Error updating visita fallida", visita.getId());
                 }
 
             } catch (SQLException ex) {

@@ -232,6 +232,11 @@ public class SrvProcesarLote extends HttpServlet {
 			            				}
 			            			}
 	            				}
+                                                // Actualizar información de censo
+                                                
+                                                this.updateCenso(orden, conexion);
+                                                
+                                                
 	            				strLinea = buffer.readLine();
 	            				if (strLinea != null) {
 	            					cArray = strLinea.toCharArray();
@@ -1243,5 +1248,40 @@ public class SrvProcesarLote extends HttpServlet {
 		// TODO Auto-generated method stub
 		this.ProcesarPeticion(request, response);
 	}
+        
+        private boolean updateCenso(String orden, db conexion) throws SQLException {
+            boolean result = false;
+            String sql = "SELECT nro_acta,tarifa,uso,fecha_acta,ct,mt,fecha_ejecucion,visitas.brigada "
+                                + " FROM visitas,camp_orden "
+                                + " WHERE camp_orden.id_visita = visitas.id "
+                                + " AND camp_orden.num_os =? AND camp_orden.id_visita != 0 ";
+            java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
+            pst.setString(1, orden);
+            java.sql.ResultSet rs = conexion.Query(pst);
+            if (rs.next()) {
+                sql = "UPDATE qo_ordenes SET NUM_ACTA=?, NUM_CT=?, NUM_MT=?, TARIFA=?, CIUU=?,FECHA_CENSO=?, NOMBRE_OPERARIO_HDA=? "
+                                    + " WHERE NUM_OS=?";
+                            java.sql.PreparedStatement pst4 = conexion.getConnection().prepareStatement(sql);
+                            pst4.setString(1, rs.getString("nro_acta"));
+                            pst4.setString(2, rs.getString("ct"));
+                            pst4.setString(3, rs.getString("mt"));
+                            pst4.setString(4, rs.getString("tarifa"));
+                            pst4.setString(5, rs.getString("uso"));
+                            pst4.setString(6, rs.getString("fecha_acta"));
+                            pst4.setString(7, rs.getString("brigada"));
+                            pst4.setString(8, orden);
+                            
+                            if (conexion.Update(pst4) > 0) {
+                                result = true;
+                            }
+                
+                
+            }else {
+                result = true;
+            }
+            
+            
+            return result;
+        }
 
 }

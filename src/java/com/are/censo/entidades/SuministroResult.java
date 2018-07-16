@@ -21,6 +21,8 @@ public class SuministroResult {
     private String localidad;
     private String departamento;
     private String medidor;
+    private String alerta;
+    
 
     public SuministroResult() {
         this.encontrado = false;
@@ -34,6 +36,7 @@ public class SuministroResult {
         this.medidor = "";
         this.error = false;
         this.msgError = "";
+        this.alerta="";
     }
 
     public boolean isEncontrado() {
@@ -122,6 +125,14 @@ public class SuministroResult {
 
     public void setMsgError(String msgError) {
         this.msgError = msgError;
+    }
+
+    public String getAlerta() {
+        return alerta;
+    }
+
+    public void setAlerta(String alerta) {
+        this.alerta = alerta;
     }
     
     
