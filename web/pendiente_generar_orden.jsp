@@ -6,19 +6,23 @@
 <%@ page import="java.sql.*"%>
 <%    db conexion = new db();
     String usuario = (String) session.getAttribute("usuario");
-    //String perfil = (String) session.getAttribute("perfil");
+    String perfil_usuario = (String) session.getAttribute("perfil");
 
     String sql = "SELECT ID,NIC, NIS, NUM_OS, COMENTARIO, CONTRATISTA, CONTNOMB, "
-            + " BRIGADA,RECUNOMB, ID_CAMP,CAMPDESC, ZONA, ZONANOMB, FECHA_CARGA "
+            + " BRIGADA,RECUNOMB, ID_CAMP,CAMPDESC, ZONA, ZONANOMB, FECHA_CARGA, USUARIO_CARGA, USUARIO_APP "
             + " FROM camp_orden "
             + " INNER JOIN contratistas ON CONTRATISTA = CONTCODI "
             + " INNER JOIN recurso ON BRIGADA = RECUCODI "
             + " INNER JOIN camp ON ID_CAMP = campcodi "
             + " INNER JOIN zonas ON ZONA = zonacodi "
-            + " WHERE USUARIO_CARGA = ? AND NUM_OS = ''";
+            + " WHERE NUM_OS = ''";
+    
+    if (!perfil_usuario.equals("1") && !perfil_usuario.equals("6")) {
+        sql += "AND USUARIO_CARGA = '" + usuario + "'";
+    }
 
     java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
-    pst.setString(1, usuario);
+    //pst.setString(1, usuario);
     java.sql.ResultSet rs = conexion.Query(pst);
 
     int count = 0;
@@ -52,6 +56,7 @@
 
             <table>
                 <tr>
+                    <th></th>
                     <th>FECHA</th>
                     <th>NIC</th>
                     <th>NIS</th>
@@ -60,10 +65,16 @@
                     <th>BRIGADA</th>
                     <th>CAMPAÑA</th>
                     <th>ZONA</th>
+                    <th>BANDEJA</th>
                     <th>ACCION</th>
                 </tr>
                 <% while (rs.next()) {%>
                 <tr <%= ((count % 2 == 0) ? "class='odd'" : "")%>>
+                    <td>
+                        <%  if (!rs.getString("USUARIO_APP").equals("")) {  %>
+                        <img src="images/device.png">
+                        <%  }  %>
+                    </td>
                     <td><img src='images/calendario.png'><%= rs.getString("FECHA_CARGA")%></td>
                     <td><%= rs.getString("NIC")%></td>
                     <td><%= rs.getString("NIS")%></td>
@@ -72,12 +83,13 @@
                     <td><img src='images/recurso.png'><strong><%= rs.getString("BRIGADA")%></strong> <%= rs.getString("RECUNOMB")%></td>
                     <td><strong><%= rs.getString("ID_CAMP")%></strong> <%= rs.getString("CAMPDESC")%></td>
                     <td><%= rs.getString("ZONANOMB")%></td>
+                    <td><%= rs.getString("USUARIO_CARGA")%></td>
                     <td><a href = "actualizar_orden.jsp?id=<%= rs.getInt("ID")  %>">Generar</a></td>
                 </tr>
                 <% count++; %>
                 <% } %>
                 <tr>
-                    <td colspan="8">Registros: <%= count%></td>
+                    <td colspan="11">Registros: <%= count%></td>
                 </tr>
             </table>
             <% if (count == 0) { %>

@@ -42,6 +42,7 @@ public class RESTEstadoOrden extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             Gson gson = new Gson();
             EstadoOrden estado = null;
+            EstadoOrdenResult estadoResult = new EstadoOrdenResult();
             String json = "";
             try {
 
@@ -77,14 +78,16 @@ public class RESTEstadoOrden extends HttpServlet {
                 
                 CtlEstadoOrden controlador = new CtlEstadoOrden(estado);
                 controlador.Find();
-                EstadoOrdenResult estadoResult =controlador.getEstadoResult();
-                out.print(gson.toJson(estadoResult));
+                estadoResult =controlador.getEstadoResult();
+                
                 
             } catch (Exception ex) {
                 Logger.getLogger(RESTEstadoOrden.class.getName()).log(Level.SEVERE, null, ex);
-                response.sendError(500, "Error:" + ex.getMessage());
+                estadoResult.setError(true);
+                estadoResult.setMsgError(ex.getMessage());
             }
    
+            out.print(gson.toJson(estadoResult));
         }
     }
 

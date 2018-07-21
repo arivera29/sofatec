@@ -139,6 +139,8 @@
                 </table>
             </form>
             <div id="info"></div>
+            <a href="estado_bandejas.jsp" name="cmd_estado_bandeja">Estado bandejas</a>
+            <a href="reporte_bandejas.jsp" name="cmd_estado_bandeja">Reportes APP</a>
             <div id="list"></div>
 
         </div>

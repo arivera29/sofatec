@@ -34,6 +34,7 @@ public class CtlVisitas {
     private ArrayList<Visita> visitas;
     private String dirImages;
     private db conexion;
+    private final static Logger LOGGER = Logger.getLogger(CtlVisitas.class.getName());
 
     public CtlVisitas(db conexion) {
         this.conexion = conexion;
@@ -114,24 +115,27 @@ public class CtlVisitas {
         pst.setInt(12, request.getId_visita());
         
         if (conexion.Update(pst) > 0  
-                && this.AddCensoVisita(request.getId_visita(), request.getCenso())
+                && this.AddCensoVisita(request.getId_visita(), request.getCenso(), request.getNic())
                 && this.AddImage(request.getId_visita(), request.getFotos()) ) {
                 
                 // Creamos una orden asociada al identificador de la visita
-
+                LOGGER.log(Level.INFO, "[REQUEST_CENSO_EFECTIVA] -> [{0}] Generating OS request...", request.getNic());
                 CtlOrden controlador = new CtlOrden(request.ObtenerOrden(),this.dirImages);
                 controlador.setDirImages(this.dirImages);
                 if (controlador.Add(conexion, request.getId_visita(), false)) {
                     conexion.Commit();
+                    LOGGER.log(Level.INFO, "[REQUEST_CENSO_EFECTIVA] -> [{0}] Generated OS request OK", request.getNic());
                     result = true;
                 }else {
                     conexion.Rollback();
+                    LOGGER.log(Level.INFO, "[REQUEST_CENSO_EFECTIVA] -> [{0}] Error generating OS request. {1}", new Object[] { request.getNic(), controlador.getOrdenResult().getMsgError() });
                     throw new SQLException(controlador.getOrdenResult().getMsgError());
                 }
             
                 
 
         }else {
+            LOGGER.log(Level.INFO, "[REQUEST_VISITA_CENSO_EFECTIVA] -> [{0}] Error Generating OS request... ", request.getNic());
             throw new SQLException("Error al actualizar la visita como efectiva");
         }
         
@@ -175,16 +179,20 @@ public class CtlVisitas {
         if (conexion.Update(pst)>0 
                 && this.AddImage(orden.getId_visita(), orden.getFotos())) {
                 // Creamos una orden asociada al identificador de la visita
+                LOGGER.log(Level.INFO, "[REQUEST_VISITA_INSPECCION_EFECTIVA] -> [{0}] Generating OS request...", new Object[] { orden.getNic()});
                 CtlOrden controlador = new CtlOrden(orden.ObtenerOrden(),this.dirImages);
                 controlador.setDirImages(this.dirImages);
                 if (controlador.Add(conexion, orden.getId_visita(), false)) {
-                    conexion.Commit();
+                    
+                    LOGGER.log(Level.INFO, "[REQUEST_VISITA_INSPECCION_EFECTIVA] -> [{0}] Generated OS request OK", new Object[] { orden.getNic()});conexion.Commit();
                     result = true;
                 }else {
                     conexion.Rollback();
+                    LOGGER.log(Level.INFO, "[REQUEST_VISITA_INSPECCION_EFECTIVA] -> [{0}] Error generating OS request. {1}", new Object[] { orden.getNic(), controlador.getOrdenResult().getMsgError()});
                     throw new SQLException(controlador.getOrdenResult().getMsgError());
                 }
         }else {
+            LOGGER.log(Level.INFO, "[REQUEST_VISITA_INSPECCION_EFECTIVA] -> [{0}] Error generating OS request. [Rollback]", new Object[] { orden.getNic()}); 
             conexion.Rollback();
         }
         
@@ -223,10 +231,11 @@ public class CtlVisitas {
         return result;
     }
     
-    private boolean AddCensoVisita(int id, ArrayList<Censo> censo) throws SQLException {
+    private boolean AddCensoVisita(int id, ArrayList<Censo> censo,String nic) throws SQLException {
         boolean result = false;
         int cont=0;
         if (censo.isEmpty() ) return true;
+        LOGGER.log(Level.INFO, "[REQUEST_VISITA_CENSO_EFECTIVA] -> [{0}] Add equipos. Items {1} id {2}", new Object[] {nic, censo.size(), id});
         String sql ="INSERT INTO qo_censo (NUM_OS,ID_EQUIPO,CARGA,CANTIDAD,VISITA) VALUES (?,?,0,?,?)"; 
         for (Censo c : censo) {
             java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
@@ -235,11 +244,13 @@ public class CtlVisitas {
             pst.setInt(3, c.getCantidad());
             pst.setInt(4, id);
             if (conexion.Update(pst) > 0) {
+                LOGGER.log(Level.INFO, "[REQUEST_VISITA_CENSO_EFECTIVA] -> [{0}] Add equipo {1} cantidad {2} id {3} ", new Object[] {nic, c.getEquipo(), c.getCantidad(), id});
                 cont++;
             }
             
         }
         if (cont==censo.size()) {
+            LOGGER.log(Level.INFO, "[REQUEST_VISITA_CENSO_EFECTIVA] -> [{0}] Equipos saved OK. Items {1}", new Object[]{nic, cont});
             result = true;
         }else {
             throw new SQLException("Error al guardar items del censo");

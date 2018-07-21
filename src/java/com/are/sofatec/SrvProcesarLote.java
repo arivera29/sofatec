@@ -1,5 +1,6 @@
 package com.are.sofatec;
 
+import com.are.manejadores.GeneradorPlantilla;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -137,6 +138,7 @@ public class SrvProcesarLote extends HttpServlet {
 	            				String[] registro = strLinea.split("	");
 	            				String orden = registro [0].substring(1);
 	            				String lote = registro [10];
+                                                String tipo = registro[1];
 	            				
 	            				String sql = "SELECT NUM_OS,ESTADO_OPER,NUM_LOTE FROM QO_ORDENES WHERE NUM_OS=?";
 	            				java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
@@ -234,7 +236,7 @@ public class SrvProcesarLote extends HttpServlet {
 	            				}
                                                 // Actualizar información de censo
                                                 
-                                                this.updateCenso(orden, conexion);
+                                                this.updateCenso(orden, tipo, conexion);
                                                 
                                                 
 	            				strLinea = buffer.readLine();
@@ -1249,17 +1251,23 @@ public class SrvProcesarLote extends HttpServlet {
 		this.ProcesarPeticion(request, response);
 	}
         
-        private boolean updateCenso(String orden, db conexion) throws SQLException {
+        private boolean updateCenso(String orden, String tipo, db conexion) throws SQLException, Exception {
             boolean result = false;
-            String sql = "SELECT nro_acta,tarifa,uso,fecha_acta,ct,mt,fecha_ejecucion,visitas.brigada "
+            String sql = "SELECT nro_acta,tarifa,uso,fecha_acta,ct,mt,"
+                                + "fecha_ejecucion,visitas.brigada,"
+                                + "camp_orden.COMENTARIO "
                                 + " FROM visitas,camp_orden "
                                 + " WHERE camp_orden.id_visita = visitas.id "
-                                + " AND camp_orden.num_os =? AND camp_orden.id_visita != 0 ";
+                                + " AND camp_orden.num_os =? "
+                                + " AND camp_orden.id_visita != 0 ";
             java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
             pst.setString(1, orden);
             java.sql.ResultSet rs = conexion.Query(pst);
             if (rs.next()) {
-                sql = "UPDATE qo_ordenes SET NUM_ACTA=?, NUM_CT=?, NUM_MT=?, TARIFA=?, CIUU=?,FECHA_CENSO=?, NOMBRE_OPERARIO_HDA=? "
+                sql = "UPDATE qo_ordenes SET NUM_ACTA=?, NUM_CT=?, NUM_MT=?, TARIFA=?, "
+                        + "CIUU=?,FECHA_CENSO=?, "
+                        + "NOMBRE_OPERARIO_HDA=?, "
+                        + "ESTADO_OPER=99, FECHA_CIERRE=?, OBSERVACION=? "
                                     + " WHERE NUM_OS=?";
                             java.sql.PreparedStatement pst4 = conexion.getConnection().prepareStatement(sql);
                             pst4.setString(1, rs.getString("nro_acta"));
@@ -1269,9 +1277,13 @@ public class SrvProcesarLote extends HttpServlet {
                             pst4.setString(5, rs.getString("uso"));
                             pst4.setString(6, rs.getString("fecha_acta"));
                             pst4.setString(7, rs.getString("brigada"));
-                            pst4.setString(8, orden);
+                            pst4.setString(8, rs.getString("fecha_ejecucion"));
+                            pst4.setString(9, rs.getString("COMENTARIO"));
+                            pst4.setString(10, orden);
                             
                             if (conexion.Update(pst4) > 0) {
+                                GeneradorPlantilla controlador = new GeneradorPlantilla(conexion);
+                                controlador.GenerarPlantilla(orden, tipo);
                                 result = true;
                             }
                 

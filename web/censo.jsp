@@ -94,8 +94,8 @@
         rsOrdenIsEmpty = !rsOrden.next();
     }
 
-    java.sql.ResultSet rsTarifas = conexion.Query("SELECT COD_TAR, DESC_TAR FROM QO_TARIFAS WHERE COD_TAR != '-1' ORDER BY DESC_TAR");
-    java.sql.ResultSet rsCIUU = conexion.Query("SELECT COD_CIUU, DESC_CIUU FROM QO_CIUU WHERE COD_CIUU != '-1' ORDER BY DESC_CIUU");
+    java.sql.ResultSet rsTarifas = conexion.Query("SELECT COD_TAR, DESC_TAR FROM QO_TARIFAS ORDER BY DESC_TAR");
+    java.sql.ResultSet rsCIUU = conexion.Query("SELECT COD_CIUU, DESC_CIUU FROM QO_CIUU ORDER BY DESC_CIUU");
     java.sql.ResultSet rsCategorias = conexion.Query("SELECT * FROM QO_CATEGORIAS WHERE CATEG_ID != 1 ORDER BY CATEG_DESC");
 
 

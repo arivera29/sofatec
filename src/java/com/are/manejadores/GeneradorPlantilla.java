@@ -47,7 +47,10 @@ public class GeneradorPlantilla {
     public String obtenerObservacion(String orden) throws SQLException {
         String cadena = "";
 
-        String sql = "SELECT  NUM_ACTA, NOMBRE_OPERARIO_HDA, FECHA_CENSO, NUM_MT, NUM_CT FROM QO_ORDENES WHERE NUM_OS=?";
+        String sql = "SELECT  NUM_ACTA, NOMBRE_OPERARIO_HDA, "
+                + " FECHA_CENSO, NUM_MT, NUM_CT, "
+                + " IFNULL(OBSERVACION,'') OBSERVACION "
+                + " FROM QO_ORDENES WHERE NUM_OS=?";
 
         java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
         pst.setString(1, orden);
@@ -59,6 +62,9 @@ public class GeneradorPlantilla {
             cadena += " Tec. " + rs0.getString("NOMBRE_OPERARIO_HDA");
             cadena += " CT=" + rs0.getString("NUM_CT");
             cadena += " MT=" + rs0.getString("NUM_MT");
+            if (!rs0.getString("OBSERVACION").equals("")) {
+                cadena += " OBS " + rs0.getString("OBSERVACION");
+            }
 
         }
 
