@@ -181,7 +181,7 @@ public class RESTOrden extends HttpServlet {
                 java.sql.ResultSet rs1 = conexion.Query(pst0);
                 if (rs1.next()) {
                     LOGGER.log(Level.INFO, "[REQUEST_GENERATION_OS] -> [VALIDATING] OS repeat today on Server for NIC {0}", orden.getNic());
-                    throw new Exception("Ya se ha creado una solicitud de generacion de orden por para el NIC " + orden.getNic() + " el dia de hoy");
+                    throw new Exception("Ya se ha creado una solicitud de generacion de orden para el NIC " + orden.getNic() + " el dia de hoy");
                 }
 
                 CtlOrden controlador = new CtlOrden(orden, directorio);

@@ -8,6 +8,8 @@ package com.are.manejadores;
 import com.are.sofatec.db;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -17,6 +19,7 @@ public class GeneradorPlantilla {
 
     private db conexion;
     private ArrayList<String> obs;
+    private final static Logger LOGGER = Logger.getLogger(GeneradorPlantilla.class.getName());
 
     public GeneradorPlantilla(db conexion) {
         this.conexion = conexion;
@@ -45,6 +48,7 @@ public class GeneradorPlantilla {
     
 
     public String obtenerObservacion(String orden) throws SQLException {
+        LOGGER.log(Level.INFO, "[GENERATE_TEMPLATE] -> Get observacion OS {0}", orden);
         String cadena = "";
 
         String sql = "SELECT  NUM_ACTA, NOMBRE_OPERARIO_HDA, "
@@ -85,6 +89,8 @@ public class GeneradorPlantilla {
         
         cadena2 = " Total Censo " + totalCenso + " " + cadena2;
         cadena += cadena2;
+        
+        LOGGER.log(Level.INFO, "[GENERATE_TEMPLATE] -> Generate Observacion OS  {0} {1}", new Object[]{orden, cadena});
 
         return cadena;
     }
@@ -133,7 +139,7 @@ public class GeneradorPlantilla {
 
     public boolean GenerarPlantilla(String orden, String tipo) throws SQLException, Exception {
         boolean resultado = false;
-
+        LOGGER.log(Level.INFO, "[GENERATE_TEMPLATE] -> Generating template OS {0} tipo {1}", new Object[]{orden, tipo});
         String observacion = this.obtenerObservacion(orden);
         this.obs = this.dividirObservacion(observacion, 200);
         int index = 0;
@@ -250,6 +256,7 @@ public class GeneradorPlantilla {
     }
 
     private void InicializarOrden(String orden) throws SQLException {
+        LOGGER.log(Level.INFO, "[GENERATE_TEMPLATE] -> Initializate OS {0}", orden);
         String sql = "UPDATE QO_PASOS SET CUMPLIDO=0, CO_ACCEJE='', OBSERVACION='', EDIT_OBS=0 WHERE NUM_OS=? ";
         java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
         pst.setString(1, orden);
@@ -263,16 +270,20 @@ public class GeneradorPlantilla {
     }
 
     private void AgregarLectura(String orden) throws SQLException {
+        LOGGER.log(Level.INFO, "[GENERATE_TEMPLATE] -> Remove record lectura OS {0}", orden);
         conexion.Update("DELETE FROM QO_ORDEN_LECTURA WHERE NUM_OS='" + orden + "'");
         String sql = "SELECT NUM_APA FROM QO_APARATOS WHERE NUM_OS=?";
         java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
         pst.setString(1, orden);
+        LOGGER.log(Level.INFO, "[GENERATE_TEMPLATE] -> Verify if OS {0} have record in QO_APARATOS", orden);
         java.sql.ResultSet rs = conexion.Query(pst);
         if (rs.next()) {
+            LOGGER.log(Level.INFO, "[GENERATE_TEMPLATE] -> OS {0} record in QO_APARAROS found ", orden);
             sql = "INSERT INTO QO_ORDEN_LECTURA (NUM_OS,NUM_APA,LECTURA) VALUES (?,?,1)";
             java.sql.PreparedStatement pst2 = conexion.getConnection().prepareStatement(sql);
             pst2.setString(1, orden);
             pst2.setString(2, rs.getString("NUM_APA"));
+            LOGGER.log(Level.INFO, "[GENERATE_TEMPLATE] -> Add record of LECTURA=1 for OS {0}", orden);
             conexion.Update(pst2);
         }
     }

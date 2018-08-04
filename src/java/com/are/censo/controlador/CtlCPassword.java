@@ -61,19 +61,23 @@ public class CtlCPassword {
                conexion.Commit();
                changepassword = new CPasswordResult();
                changepassword.setChangepassord(true);
-               changepassword.setError("");
+               changepassword.setError(false);
+               changepassword.setMsgError("");
                result = true;
            }else {
                changepassword = new CPasswordResult();
                changepassword.setChangepassord(false);
-               changepassword.setError("Error al actualizar la contraseña del usuario " + cpassword.getUser());
+               changepassword.setError(true);
+               changepassword.setMsgError("Error al actualizar la contraseña del usuario " + cpassword.getUser());
            }
 
            conexion.Close();
        }else {
            changepassword = new CPasswordResult();
            changepassword.setChangepassord(false);
-           changepassword.setError("Usuario y/o contraseña no validos");
+           changepassword.setError(true);
+           changepassword.setMsgError("Usuario y/o contraseña no validos");
+           
        }
        
        

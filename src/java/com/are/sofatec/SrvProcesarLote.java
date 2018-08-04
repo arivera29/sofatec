@@ -15,6 +15,8 @@ import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Servlet implementation class ProcessOrders
@@ -22,6 +24,7 @@ import java.sql.SQLException;
 @WebServlet("/SrvProcesarLote")
 public class SrvProcesarLote extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+        private final static Logger LOGGER = Logger.getLogger(SrvProcesarLote.class.getName());
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -55,7 +58,8 @@ public class SrvProcesarLote extends HttpServlet {
 		String zona = (String)request.getParameter("zona");
 		
 		
-		
+		LOGGER.log(Level.INFO, "Procesando archivo {0}", filename);
+                
 		db conexion = null;
 		
 		try {
@@ -78,7 +82,8 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_ordenes.trim().equals("1")) {
 	            		if (strLinea.equals("3SELECT * FROM PASOS")) {
-	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_PASOS</strong><br>");
+	            			LOGGER.log(Level.INFO, "Procesando PASOS");
+                                        out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_PASOS</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
 	            			strLinea = buffer.readLine();
@@ -127,7 +132,8 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_ordenes.trim().equals("1")) { 
 	            		if (strLinea.equals("3SELECT * FROM ORDENES")) {
-	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_ORDENES</strong><br>");
+	            			LOGGER.log(Level.INFO, "Procesando ORDENES");
+                                        out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_ORDENES</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
 	            			strLinea = buffer.readLine();
@@ -140,6 +146,8 @@ public class SrvProcesarLote extends HttpServlet {
 	            				String lote = registro [10];
                                                 String tipo = registro[1];
 	            				
+                                                LOGGER.log(Level.INFO, "Procesando orden {0}", orden);
+                                                
 	            				String sql = "SELECT NUM_OS,ESTADO_OPER,NUM_LOTE FROM QO_ORDENES WHERE NUM_OS=?";
 	            				java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
 	            				pst.setString(1, orden);
@@ -223,19 +231,21 @@ public class SrvProcesarLote extends HttpServlet {
 						            					conexion.Commit();
 						            				}
 						            			}catch (SQLException e) {
-						            					out.println("<img src='images/alerta.gif'>" +e.getMessage() + ", Error No. " + e.getErrorCode() + "<br>");
+                                                                                    LOGGER.log(Level.INFO,"[PROCESS_LOTE] -> Error {0} {1}", new Object[]{sql, e.getMessage()});
+                                                                                    out.println("<img src='images/alerta.gif'>" +e.getMessage() + ", Error No. " + e.getErrorCode() + "<br>");
 						            			}
 			            						
 			            					}
 			            				}
 			            			}catch (SQLException e) {
 			            				if (e.getErrorCode() != 1062) { // registro repetido
+                                                                        LOGGER.log(Level.INFO,"[PROCESS_LOTE] -> Error {0} {1}", new Object[]{sql, e.getMessage()});
 			            					out.println("<img src='images/alerta.gif'>" +e.getMessage() + ", Error No. " + e.getErrorCode() + "<br>");
 			            				}
 			            			}
 	            				}
                                                 // Actualizar información de censo
-                                                
+                                                LOGGER.log(Level.INFO,"[PROCESS_LOTE] -> Validating censo OS {0}", orden);
                                                 this.updateCenso(orden, tipo, conexion);
                                                 
                                                 
@@ -252,7 +262,8 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_ordenes.trim().equals("1")) {
 	            		if (strLinea.equals("3SELECT * FROM APARATOS")) {
-	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_APARATOS</strong><br>");
+	            			LOGGER.log(Level.INFO, "Procesando APARATOS");
+                                        out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_APARATOS</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
 	            			strLinea = buffer.readLine();
@@ -300,6 +311,7 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_ordenes.trim().equals("1")) {
 	            		if (strLinea.equals("3SELECT * FROM APACONEN")) {
+                                        LOGGER.log(Level.INFO, "Procesando APACONEN");
 	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_APACONEN</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
@@ -394,6 +406,7 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_tipoos.trim().equals("1")) {
 	            		if (strLinea.equals("3SELECT * FROM TIPOS")) {
+                                        LOGGER.log(Level.INFO, "Procesando TIPOS");
 	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_TIPOS</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
@@ -441,6 +454,7 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_material.trim().equals("1")) {
 	            		if (strLinea.equals("3SELECT * FROM MATER_I")) {
+                                        LOGGER.log(Level.INFO, "Procesando MATER_I");
 	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_MATER_I</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
@@ -488,6 +502,7 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_material.trim().equals("1")) {
 	            		if (strLinea.equals("3SELECT * FROM MATER_R")) {
+                                        LOGGER.log(Level.INFO, "Procesando MATER_R");
 	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_MATER_R</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
@@ -535,6 +550,7 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_material.trim().equals("1")) {
 	            		if (strLinea.equals("3SELECT * FROM DESC_MI")) {
+                                        LOGGER.log(Level.INFO, "Procesando DESC_MI");
 	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_DESC_MI</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
@@ -585,6 +601,7 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_material.trim().equals("1")) {
 	            		if (strLinea.equals("3SELECT * FROM DESC_MR")) {
+                                        LOGGER.log(Level.INFO, "Procesando DESC_MR");
 	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_DESC_MR</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
@@ -728,6 +745,7 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_codigos.equals("1")) {
 	            		if (strLinea.equals("3SELECT * FROM CODIGOS")) {
+                                        LOGGER.log(Level.INFO, "Procesando CODIGOS");
 	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_CODIGOS</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
@@ -775,7 +793,8 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_anomalias.trim().equals("1")) {
 	            		if (strLinea.equals("3SELECT * FROM ANOM")) {
-	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_ANOM</strong><br>");
+	            			LOGGER.log(Level.INFO, "Procesando ANOM");
+                                        out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_ANOM</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
 	            			strLinea = buffer.readLine();
@@ -867,7 +886,8 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_ordenes.trim().equals("1")) {
 	            		if (strLinea.equals("3SELECT * FROM OSACCION")) {
-	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_OSACCION</strong><br>");
+	            			LOGGER.log(Level.INFO, "Procesando OSACCION");
+                                        out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_OSACCION</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
 	            			strLinea = buffer.readLine();
@@ -914,6 +934,7 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_ordenes.trim().equals("1")) {
 	            		if (strLinea.equals("3SELECT * FROM DATOSUM")) {
+                                        LOGGER.log(Level.INFO, "Procesando DATOSUM");
 	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_DATOSUM</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
@@ -962,6 +983,7 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_flujos.equals("1")) {
 	            		if (strLinea.equals("3SELECT * FROM OSACCIONFLUJO")) {
+                                        LOGGER.log(Level.INFO, "Procesando OSACCIONFLUJO");
 	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_OSACCIONFLUJO</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
@@ -1009,6 +1031,7 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_flujos.equals("1")) {
 	            		if (strLinea.equals("3SELECT * FROM PASOSFLUJO")) {
+                                        LOGGER.log(Level.INFO, "Procesando PASOSFLUJO");
 	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_PASOSFLUJO</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
@@ -1055,6 +1078,7 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_flujos.equals("1")) {
 	            		if (strLinea.equals("3SELECT * FROM OSFLUJO")) {
+                                        LOGGER.log(Level.INFO, "Procesando OSFLUJO");
 	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_OSFLUJO</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
@@ -1101,6 +1125,7 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_ordenes.trim().equals("1")) {
 	            		if (strLinea.equals("3SELECT * FROM RECIBOS")) {
+                                        LOGGER.log(Level.INFO, "Procesando RECIBOS");
 	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_RECIBOS</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
@@ -1149,6 +1174,7 @@ public class SrvProcesarLote extends HttpServlet {
             		
             		if (opt_ordenes.trim().equals("1")) {
 	            		if (strLinea.equals("3SELECT * FROM PRECIN")) {
+                                        LOGGER.log(Level.INFO, "Procesando PRECIN");
 	            			out.println("<img src='images/upload.png'><strong>Subiendo Tabla QO_PRECIN</strong><br>");
 	            			int contador = 0;
 	            			int reg = 0;
@@ -1252,10 +1278,11 @@ public class SrvProcesarLote extends HttpServlet {
 	}
         
         private boolean updateCenso(String orden, String tipo, db conexion) throws SQLException, Exception {
+            LOGGER.log(Level.INFO, "Init database update censo OS {0} " + orden);
             boolean result = false;
             String sql = "SELECT nro_acta,tarifa,uso,fecha_acta,ct,mt,"
                                 + "fecha_ejecucion,visitas.brigada,"
-                                + "camp_orden.COMENTARIO "
+                                + "camp_orden.COMENTARIO, visitas.id "
                                 + " FROM visitas,camp_orden "
                                 + " WHERE camp_orden.id_visita = visitas.id "
                                 + " AND camp_orden.num_os =? "
@@ -1264,6 +1291,7 @@ public class SrvProcesarLote extends HttpServlet {
             pst.setString(1, orden);
             java.sql.ResultSet rs = conexion.Query(pst);
             if (rs.next()) {
+                LOGGER.log(Level.INFO, "[PROCESS_LOTE] -> OS {0} con visita asociada {1} ", new Object[]{orden, rs.getString("id")} );
                 sql = "UPDATE qo_ordenes SET NUM_ACTA=?, NUM_CT=?, NUM_MT=?, TARIFA=?, "
                         + "CIUU=?,FECHA_CENSO=?, "
                         + "NOMBRE_OPERARIO_HDA=?, "
@@ -1281,18 +1309,25 @@ public class SrvProcesarLote extends HttpServlet {
                             pst4.setString(9, rs.getString("COMENTARIO"));
                             pst4.setString(10, orden);
                             
-                            if (conexion.Update(pst4) > 0) {
+                            if (conexion.Update(pst4) >= 0) {
+                                LOGGER.log(Level.INFO, "[PROCESS_LOTE] -> Generating template OS {0} tipo {1}", new Object[]{orden,tipo});
                                 GeneradorPlantilla controlador = new GeneradorPlantilla(conexion);
-                                controlador.GenerarPlantilla(orden, tipo);
-                                result = true;
+                                if (controlador.GenerarPlantilla(orden, tipo)) {
+                                    LOGGER.log(Level.INFO, "[PROCESS_LOTE] -> Generated template OS {0} tipo {1}", new Object[]{orden,tipo});
+                                    result = true;
+                                }else {
+                                    LOGGER.log(Level.INFO, "[PROCESS_LOTE] -> Error Generating template OS {0} tipo {1}", new Object[]{orden,tipo});
+                                }
+                                
                             }
                 
                 
             }else {
+                LOGGER.log(Level.INFO, "[PROCESS_LOTE] -> No tienen visita de censo ASOCIADO");
                 result = true;
             }
             
-            
+            LOGGER.log(Level.INFO, "[PROCESS_LOTE] -> Finish censo process OS {0}", orden);
             return result;
         }
 

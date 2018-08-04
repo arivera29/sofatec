@@ -7,6 +7,7 @@ package com.are.censo.rest;
 
 import com.are.censo.controlador.CtlCPassword;
 import com.are.censo.entidades.CPassword;
+import com.are.censo.entidades.CPasswordResult;
 import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,6 +42,7 @@ public class RESTCPassword extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             Gson gson = new Gson();
             CPassword changepassword = null;
+            CPasswordResult result = new CPasswordResult();
             String json = "";
             try {
 
@@ -87,12 +89,15 @@ public class RESTCPassword extends HttpServlet {
                 CtlCPassword controlador = new CtlCPassword(changepassword);
                 controlador.ChangePassword();
                 
-                out.print(gson.toJson(controlador.getChangepassword()));
+                result = controlador.getChangepassword();
                 
             } catch (Exception ex) {
                 Logger.getLogger(RESTCPassword.class.getName()).log(Level.SEVERE, null, ex);
-                response.sendError(500, "Error:" + ex.getMessage());
+                result.setError(true);
+                result.setMsgError(ex.getMessage());
             }
+            
+            out.print(gson.toJson(result));
    
         }
     }

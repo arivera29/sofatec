@@ -26,7 +26,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "RESTEstadoOrden", urlPatterns = {"/os/estado"})
 public class RESTEstadoOrden extends HttpServlet {
-
+    
+    private final static Logger LOGGER = Logger.getLogger(RESTEstadoOrden.class.getName());
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -40,6 +42,7 @@ public class RESTEstadoOrden extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/json;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
+            LOGGER.log(Level.INFO, "[REQUEST_STATE_OS] -> Init");
             Gson gson = new Gson();
             EstadoOrden estado = null;
             EstadoOrdenResult estadoResult = new EstadoOrdenResult();
@@ -56,30 +59,43 @@ public class RESTEstadoOrden extends HttpServlet {
 
                 json = sb.toString();
 
+                LOGGER.log(Level.INFO, "[REQUEST_STATE_OS] -> Validating JSON");
                 if (json.equals("")) {
+                    LOGGER.log(Level.INFO, "[REQUEST_STATE_OS] -> SON empty");
                     throw new Exception("Parametro JSON vacio");
                 }
                 
                 estado = gson.fromJson(json, EstadoOrden.class);
                 
+                
                 if (estado == null) {
+                    LOGGER.log(Level.INFO, "[REQUEST_STATE_OS] -> JSON no valid!");
                     throw new Exception("JSON no válido");
                 }
                 
                 if (estado.getToken().equals("")) {
+                    LOGGER.log(Level.INFO, "[REQUEST_STATE_OS] -> Field TOKEN empty");
                     throw new Exception("atributo TOKEN no válido");
                 }
                 
                 if (estado.getId().equals("")) {
+                    LOGGER.log(Level.INFO, "[REQUEST_STATE_OS] -> Filed ID empty");
                     throw new Exception("atributo ID no válido");
                 }
 
                 
-                
+                LOGGER.log(Level.INFO, "[REQUEST_STATE_OS] -> Valid state OS of ID {0}", estado.getId());
                 CtlEstadoOrden controlador = new CtlEstadoOrden(estado);
                 controlador.Find();
                 estadoResult =controlador.getEstadoResult();
-                
+                if (!estadoResult.isError()) {
+                    LOGGER.log(Level.INFO, "[REQUEST_STATE_OS] -> Find {0}", estadoResult.isEncontrado()?"SI":"NO");
+                    LOGGER.log(Level.INFO, "[REQUEST_STATE_OS] -> State {0}", estadoResult.getEstado());
+                    LOGGER.log(Level.INFO, "[REQUEST_STATE_OS] -> OS number {0}", estadoResult.getOrden());
+                }else {
+                    LOGGER.log(Level.INFO, "[REQUEST_STATE_OS] -> Find Error " );
+                    LOGGER.log(Level.INFO, "[REQUEST_STATE_OS] -> Error  {0}", estadoResult.getMsgError());
+                }
                 
             } catch (Exception ex) {
                 Logger.getLogger(RESTEstadoOrden.class.getName()).log(Level.SEVERE, null, ex);

@@ -42,6 +42,7 @@
             <h1>Visitas</h1>
             <a href="uploadvisitas.jsp">Cargar visitas</a>
             <a href="reporte_visitas.jsp">Reportes</a>
+            <a href="listado_visitas.jsp">Listado</a>
             <h2>Visitas pendientes</h2>
             <table class="table">
                 <thead>

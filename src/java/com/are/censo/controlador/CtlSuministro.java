@@ -100,10 +100,11 @@ public class CtlSuministro {
 
     private String getAlerta(String nic, db conexion) throws SQLException {
         String alerta = "";
-        String sql = "SELECT NUM_OS, DATE(FECHA_CARGA) FECHA_CARGA FROM camp_orden "
+        String sql = "SELECT NUM_OS, DATE(FECHA_GEN_OS) FECHA_GEN_OS FROM camp_orden "
                 + " WHERE NIC=? "
-                + "AND DATEDIFF(DATE(FECHA_CARGA),CURRENT_DATE()) <= 40 "
-                + "ORDER BY FECHA_CARGA DESC "
+                + " AND DATEDIFF(CURRENT_DATE(), DATE(FECHA_GEN_OS)) <= 40 "
+                + " AND NUM_OS != '' "
+                + "ORDER BY FECHA_GEN_OS DESC "
                 + "LIMIT 1";
 
         java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
@@ -111,7 +112,7 @@ public class CtlSuministro {
         java.sql.ResultSet rs = conexion.Query(pst);
         if (rs.next()) {
             LOGGER.log(Level.INFO, "QUERY_INFO_SUMINISTRO [{0}] -> Alerta 40 dias generacion OS", nic);
-            alerta = "Este nic presenta una OS generada antes de 40 días: OS:" + rs.getString("NUM_OS") + " fecha:" + rs.getString("FECHA_CARGA");
+            alerta = "Este nic presenta una OS generada antes de 40 días: OS:" + rs.getString("NUM_OS") + " fecha:" + rs.getString("FECHA_GEN_OS");
         }
 
         return alerta;

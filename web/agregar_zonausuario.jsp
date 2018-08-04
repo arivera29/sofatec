@@ -3,16 +3,16 @@
 <!DOCTYPE html>
 <%@ include file="validausuario.jsp"%>
 <%@ page import="com.are.sofatec.*" %>
-<%@ page import="com.are.manejadores.*" %>
-<%@ page import="com.are.entidades.*" %>
+<%@page import="com.are.entidades.Zona"%>
+<%@page import="com.are.manejadores.ManejadorZonas"%>
 <%@ page import="java.sql.*" %>
 
 <%
         db conexion = new db();
         String usuario = (String)request.getParameter("usuario");
         ManejadorZonas manejador = new ManejadorZonas(conexion);
-        ArrayList<zonas> lista = manejador.List();
-        ArrayList<zonas> ZonasAsignadas = manejador.List(usuario);
+        ArrayList<Zona> lista = manejador.List();
+        ArrayList<Zona> ZonasAsignadas = manejador.List(usuario);
 	
 %>
 
@@ -98,7 +98,7 @@
             <form action="" name="form1" onsubmit="javascript: return validar();" > 
                 <label  for="zona">Zona</label>
                 <select id="zona" name="zona">
-                    <% for (zonas zona : lista ) { %>
+                    <% for (Zona zona : lista ) { %>
                     <option value="<%= zona.getId()   %>"><%= zona.getNombre() %></option>
                     <% } %>
                 </select>	
@@ -115,7 +115,7 @@
                         <th>NOMBRE</th>
                         <th>ACCION</th>
                     </tr>
-                    <% for (zonas zona : ZonasAsignadas ) { %>
+                    <% for (Zona zona : ZonasAsignadas ) { %>
                     <tr>
                         <td><%= zona.getId() %></td>
                         <td><%= zona.getNombre() %></td>
