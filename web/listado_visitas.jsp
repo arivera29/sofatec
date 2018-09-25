@@ -53,6 +53,11 @@
 
                 //$("#descargar").css("display", "block");
             }
+            
+            function consultarFoto(id) {
+                url = "fotos_visita.jsp?visita=1&id="+id;
+                window.open(url, "VerFotosVisita", "width=600,height=500,scrollbars=YES,menubar=No,toolbar=NO,status=YES");
+            }
 
 
         </script>
@@ -92,7 +97,7 @@
                             <select id="reporte">
                                 <option value="all">Todos</option>
                                 <option value="1">Efectiva</option>
-                                <option value="2">Anomalia</option>
+                                <option value="3">Anomalia</option>
                             </select>
                         </td>
                     </tr>

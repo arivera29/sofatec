@@ -347,5 +347,45 @@ public class ManejadorVisita {
 
         return lista;
     }
+    
+    public boolean removeAllVisitas() throws SQLException {
+        String sql = "DELETE FROM visitas WHERE estado = 1";
+        if (conexion.Update(sql) >= 0) {
+            conexion.Commit();
+        }
+        return true;
+    }
+    
+    public boolean removeVisitaById(int id) throws SQLException {
+        String sql = "DELETE FROM visitas WHERE estado=1 AND id=?";
+        java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
+        pst.setInt(1, id);
+        
+        if (conexion.Update(pst) > 0) {
+            conexion.Commit();
+            return true;
+        } else {
+            return false;
+        }
+        
+        
+       
+    }
+    
+    public boolean removeVisitaByBrigada(String id) throws SQLException {
+        String sql = "DELETE FROM visitas WHERE estado=1 AND brigada=?";
+        java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
+        pst.setString(1, id);
+        
+        if (conexion.Update(pst) > 0) {
+            conexion.Commit();
+            return true;
+        } else {
+            return false;
+        }
+        
+        
+       
+    }
 
 }

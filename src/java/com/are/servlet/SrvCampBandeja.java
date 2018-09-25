@@ -145,6 +145,7 @@ public class SrvCampBandeja extends HttpServlet {
                     out.println("<th>ID</th>");
                     out.println("<th>USUARIO</th>");
                     out.println("<th>NOMBRE</th>");
+                    out.println("<th>PEND.</th>");
                     out.println("<th>ESTADO</th>");
                     out.println("<th></th>");
                     out.println("</tr>");
@@ -164,6 +165,8 @@ public class SrvCampBandeja extends HttpServlet {
                             nombre = manejador2.getUsuario().getNombre();
                         }
                         out.println("<td>" + nombre + "</td>");
+                        long total = manejador.Count(bandeja.getId());
+                        out.println("<td>" + total + "</td>");
                         out.println("<td>"
                                 + (bandeja.getEstado() == 1 ? "<img src=\"images/online.png\">"
                                 : "<img src=\"images/offline.png\">")
@@ -181,8 +184,15 @@ public class SrvCampBandeja extends HttpServlet {
                         }
                         String url3 = "<a href=\"javascript:Eliminar("+ bandeja.getId() + ")\">Eliminar</a>";
                         String url4 = "<a href=\"bandeja_contrata.jsp?id="+ bandeja.getId() + "\">Contratas</a>";
+                        
+                        
+                        
                         out.print(url3);
                         out.print(url4);
+                        
+                        if (total > 0) {
+                            out.println("<a href=\"transferir_bandeja.jsp?id="+ bandeja.getId() + "\">Transferir</a>");
+                        }
                         out.println("</td>");
                         out.println("</tr>");
                         cont++;
@@ -270,6 +280,23 @@ public class SrvCampBandeja extends HttpServlet {
                     out.print("Error al procesar la solicitud");
                 }
 
+            }
+            
+            if (operacion.equals("transferir")) {
+                String source = (String) request.getParameter("source");
+                String destination = (String) request.getParameter("destination");
+                
+                conexion = new db();
+
+                ManejadorCampBandeja manejador = new ManejadorCampBandeja(conexion);
+
+                if (manejador.Transferir(Integer.parseInt(source),Integer.parseInt(destination))) {
+                    out.print("OK");
+                } else {
+                    out.print("Error al procesar la solicitud");
+                }
+                
+                
             }
 
         } catch (SQLException e) {

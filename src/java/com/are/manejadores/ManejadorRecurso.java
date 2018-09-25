@@ -365,6 +365,41 @@ public class ManejadorRecurso {
 
         return lista;
     }
+    
+    public ArrayList<Recurso> FilterByRoles(String [] rol) throws SQLException {
+        ArrayList<Recurso> lista = new ArrayList<Recurso>();
+        String sql = "SELECT * "
+                + " FROM recurso "
+                + " WHERE recurol IN (";
+                for (int x=0; x< rol.length; x++) {
+                    sql += rol[x];
+                    if ((x+1) < rol.length) {
+                        sql += ",";
+                    }
+                }
+                sql += ") ";
+                sql += " ORDER BY recunomb";
+        java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
+        java.sql.ResultSet rs = conexion.Query(pst);
+        while (rs.next()) {
+            Recurso recurso = new Recurso();
+            recurso.setCodigo(rs.getString("recucodi"));
+            recurso.setNombre(rs.getString("recunomb"));
+            recurso.setDireccion(rs.getString("recudire"));
+            recurso.setTelefono(rs.getString("recutele"));
+            recurso.setCorreo(rs.getString("recumail"));
+            recurso.setCargo(rs.getString("recucarg"));
+            recurso.setRol(rs.getInt("recurol"));
+            recurso.setContratista(rs.getInt("recucont"));
+            recurso.setEstado(rs.getInt("recuesta"));
+            recurso.setZona(rs.getInt("recuzona"));
+            recurso.setAuthAPP(rs.getInt("recuaapp"));
+
+            lista.add(recurso);
+        }
+
+        return lista;
+    }
 
     public boolean Find(String key) throws SQLException {
         boolean result = false;

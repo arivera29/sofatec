@@ -220,4 +220,41 @@ public class ManejadorCampBandeja {
         return lista;
     }
     
+    public long Count(int bandeja ) throws SQLException {
+        long cont=0;
+        String sql = "SELECT count(*) as total "
+                + " FROM camp_orden "
+                + "WHERE USUARIO_CARGA = (SELECT cabauser FROM camp_bandeja WHERE cabanuid=?) "
+                + "AND NUM_OS = '' ";
+        
+        java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
+        pst.setInt(1, bandeja);
+        java.sql.ResultSet rs = conexion.Query(pst);
+        if (rs.next()) {
+            cont = rs.getLong("total");
+        }
+        
+        
+        return cont;
+    }
+    
+    public boolean Transferir(int source, int destination) throws SQLException {
+        boolean result = false;
+        String sql = "UPDATE camp_orden "
+                + " SET USUARIO_CARGA =? "
+                + " WHERE USUARIO_CARGA=? "
+                + " AND NUM_OS=?";
+        java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
+        pst.setInt(1, destination);
+        pst.setInt(2, source);
+        
+        if (conexion.Update(pst) > 0) {
+            conexion.Commit();
+            result = true;
+        }
+        
+        
+        return result;
+    }
+    
 }

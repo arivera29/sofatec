@@ -33,7 +33,39 @@
             });
         </script>
         <script>
-
+            function remove_all() {
+                if (confirm("Esta seguro de eliminar todas las visitas pendientes?")) {
+                    var url ="SrvVisitas";
+                    $.get(url, {
+                        operacion : "all"
+                    }, function (data) {
+                        if (data.trim() == "OK") {
+                            alert("Visitas Eliminadas correctamente");
+                            location.reload();
+                        }else {
+                            alert(data);
+                        }
+                    });
+                }               
+            }
+            
+            function remove_brigada(brigada) {
+                if (confirm("Esta seguro de eliminar todas las visitas pendientes de la birgada " + brigada + "?")) {
+                    var url ="SrvVisitas";
+                    $.get(url, {
+                        operacion : "brigada",
+                        brigada : brigada
+                    }, function (data) {
+                        if (data.trim() == "OK") {
+                            alert("Visitas Eliminadas correctamente");
+                            location.reload();
+                        }else {
+                            alert(data);
+                        }
+                    });
+                }          
+            }
+            
         </script>
     </head>
     <body>
@@ -43,7 +75,9 @@
             <a href="uploadvisitas.jsp">Cargar visitas</a>
             <a href="reporte_visitas.jsp">Reportes</a>
             <a href="listado_visitas.jsp">Listado</a>
+            <a href="listado_censos.jsp">Censos</a>
             <h2>Visitas pendientes</h2>
+            
             <table class="table">
                 <thead>
                     <tr>
@@ -63,14 +97,19 @@
                         <td><%= rs.getString("brigada")%></td>
                         <td><%= rs.getString("recunomb")%></td>
                         <td><%= rs.getString("total")%></td>
-                        <td><a href="visitasbrigada.jsp?id=<%= rs.getString("brigada")%>">Ver</a></td>
+                        <td>
+                            <a href="visitasbrigada.jsp?id=<%= rs.getString("brigada")%>">Ver</a>
+                            <a href="javascript:remove_brigada('<%= rs.getString("brigada") %>');">Eliminar</a>
+                        </td>
                     </tr>
                     <%  }  %>
                 </tbody>
             </table>
             <% if (rows == 0) { %>
             <p>No hay registros</p>
-            <%  } %>
+            <%  } else { %>
+            <button name="cmd>_remove_all" type="button" onclick="javascript:remove_all();">Eliminar visitas pendientes</button>
+            <% } %>
         </div>
         <%@ include file="foot.jsp" %>
     </body>

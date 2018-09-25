@@ -6,7 +6,10 @@
 package com.are.servlet;
 
 import com.are.sofatec.db;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -21,8 +24,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author aimerrivera
  */
-@WebServlet(name = "SrvAlertaSuministro", urlPatterns = {"/SrvAlertaSuministro"})
-public class SrvAlertaSuministro extends HttpServlet {
+@WebServlet(name = "SrvDownloadPhotoVisita", urlPatterns = {"/SrvDownloadPhotoVisita"})
+public class SrvDownloadPhotoVisita extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -36,43 +39,69 @@ public class SrvAlertaSuministro extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-
-            String nic = (String)request.getParameter("nic");
+        try {
+            String id = (String) request.getParameter("id");
+            String visita = (String) request.getParameter("visita");
+            
             db conexion = null;
-
             try {
                 conexion = new db();
-                String sql = "SELECT NUM_OS, DATE(FECHA_GEN_OS) FECHA_GEN_OS FROM camp_orden "
-                        + " WHERE NIC=? "
-                        + "AND DATEDIFF( CURRENT_DATE( ) , DATE( FECHA_GEN_OS ) )  <= 40 "
-                        + "ORDER BY FECHA_GEN_OS DESC "
-                        + "LIMIT 1";
-                        
+                String sql = "SELECT path FROM camp_orden_fotos WHERE id=? and visita=?";
                 java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
-                pst.setString(1, nic);
+                pst.setInt(1, Integer.parseInt(id));
+                pst.setInt(2, Integer.parseInt(visita));
                 java.sql.ResultSet rs = conexion.Query(pst);
                 if (rs.next()) {
-                    out.print("Este nic presenta una OS generada antes de 40 días: OS:" + rs.getString("NUM_OS") + " fecha:" + rs.getString("FECHA_CARGA"));
+                    String path = rs.getString("path");
+                    //path = this.parserPath(path);
+                    File file = new File(path);
+                    if (file.exists()) {
+                        FileInputStream inStream = new FileInputStream(file);
+                        String mimeType = "application/octet-stream";
+                        // modifies response
+                        response.setContentType(mimeType);
+                        response.setContentLength((int) file.length());
+
+                        // forces download
+                        String headerKey = "Content-Disposition";
+                        String fname = file.getName();
+                        String headerValue = String.format("attachment; filename=\"%s\"", fname);
+                        response.setHeader(headerKey, headerValue);
+
+                        // obtains response's output stream
+                        OutputStream outStream = response.getOutputStream();
+
+                        byte[] buffer = new byte[4096];
+                        int bytesRead = -1;
+
+                        while ((bytesRead = inStream.read(buffer)) != -1) {
+                            outStream.write(buffer, 0, bytesRead);
+                        }
+
+                        inStream.close();
+                        outStream.close();
+
+                    }else {
+                        
+                        PrintWriter out = response.getWriter();
+                        out.println(String.format("Archivo %s no se encuentra", path));
+                        out.close();
+                    } 
+
                 }
-                        
-                        
+
             } catch (SQLException ex) {
-                Logger.getLogger(SrvAlertaSuministro.class.getName()).log(Level.SEVERE, null, ex);
-                out.print("Error: " + ex.getMessage());
+                Logger.getLogger(SrvDownloadPhotoVisita.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
-                
-                if (conexion != null) {
-                    try {
-                        conexion.Close();
-                    } catch (SQLException ex) {
-                        Logger.getLogger(SrvAlertaSuministro.class.getName()).log(Level.SEVERE, null, ex);
-                        out.print("Error: " + ex.getMessage());
-                    }
+                try {
+                    conexion.Close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(SrvDownloadPhotoVisita.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
             }
 
+        } finally {
+           
         }
     }
 

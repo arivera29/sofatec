@@ -83,7 +83,12 @@ public class CtlOrden {
                 pst.setString(5, orden.getInspector());
                 pst.setString(6, orden.getIngeniero());
                 pst.setString(7, orden.getBrigada());
-                pst.setString(8, "1"); // Tipo de brigada
+                if (orden.getBrigada().equals(orden.getUsuario())) {
+                    pst.setInt(8, 2);
+                }else {
+                    pst.setInt(8, 1);
+                }
+                
                 pst.setString(9, "-1"); // Id campaña
                 pst.setString(10, bandeja.getUsuario()); // Usuario de carga
                 pst.setString(11, orden.getZona());
@@ -98,6 +103,7 @@ public class CtlOrden {
                 pst.setString(20, orden.getVoltaje1());
                 pst.setString(21, orden.getVoltaje2());
                 pst.setString(22, orden.getUsuario());   
+                
 
                 if (conexion.Update(pst) > 0) {
                     int id = conexion.getLastId();
@@ -303,6 +309,19 @@ public class CtlOrden {
         java.util.Date fechaActual = new java.util.Date();
         String fecha = dateFormat.format(fechaActual);
         return fecha;
+    }
+    
+    public static long ContadorPhoto(int id, db conexion) throws SQLException {
+        long contador = 0;
+        String sql = "SELECT count(*) as total FROM camp_orden_fotos WHERE id_orden=? AND visita=0";
+        java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
+        pst.setInt(1, id);
+        java.sql.ResultSet rs = conexion.Query(pst);
+        if (rs.next()) {
+            contador = rs.getLong("total");
+        }
+        
+        return contador;
     }
 
 }

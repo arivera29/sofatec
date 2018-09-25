@@ -280,5 +280,27 @@ public class ManejadorCamp {
         return result;
 
     }
+    
+    public int contadorPendienteUsuario(String usuario, String perfil) throws SQLException {
+        int cont=0;
+        
+        String sql = "SELECT count(NIC) FROM camp_orden WHERE NUM_OS ='' ";
+        if (perfil.equals("1") || perfil.equals("6")) {
+            
+        }else {
+            sql += " AND USUARIO_CARGA='" + usuario + "'"; 
+        }
+        
+        
+        java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
+        java.sql.ResultSet rs = conexion.Query(pst);
+        if (rs.next()) {
+            cont = rs.getInt(1);
+        }
+        
+        
+        return cont;
+    }
+    
 
 }

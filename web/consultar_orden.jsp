@@ -10,7 +10,7 @@
     String sql = "SELECT ID,NIC, NUM_OS, COMENTARIO, CONTRATISTA, CONTNOMB, "
             + " BRIGADA,R1.RECUNOMB AS NOMB_BRIGADA, ID_CAMP,CAMPDESC, ZONA,"
             + " ZONANOMB, R2.RECUNOMB AS NOMB_INSPECTOR, R3.RECUNOMB AS NOMB_INGENIERO, "
-            + " FECHA_CARGA, USUARIO_CARGA"
+            + " FECHA_CARGA, USUARIO_CARGA, ID_VISITA"
             + " FROM camp_orden "
             + " INNER JOIN contratistas ON CONTRATISTA = CONTCODI "
             + " INNER JOIN recurso R1 ON BRIGADA = R1.RECUCODI "
@@ -42,6 +42,12 @@
     
 
     int count = 0;
+    
+    sql = "SELECT filename FROM camp_orden_fotos WHERE id_orden=? AND visita=0";
+
+    java.sql.PreparedStatement pst2 = conexion.getConnection().prepareStatement(sql);
+    pst2.setString(1, rs.getString("ID"));
+    java.sql.ResultSet rsFotos = conexion.Query(pst2);
 
 
 %>
@@ -76,7 +82,7 @@
                 <tr>
                     <th colspan="2">Información Registro</th>
                 </tr>
-                <tr>
+                <tr class="odd">
                     <td>NIC</td>
                     <td><%= rs.getString("NIC")%></td>
                 </tr>
@@ -84,7 +90,7 @@
                     <td>Comentario</td>
                     <td><%= rs.getString("COMENTARIO")%></td>
                 </tr>
-                <tr>
+                <tr class="odd">
                     <td>Contratista</td>
                     <td><%= rs.getString("CONTNOMB")%></td>
                 </tr>
@@ -92,7 +98,7 @@
                     <td>Inspector</td>
                     <td><img src='images/recurso.png'><%= rs.getString("NOMB_INSPECTOR")%></td>
                 </tr>
-                <tr>
+                <tr class="odd">
                     <td>Ingeniero</td>
                     <td><img src='images/recurso.png'><%= rs.getString("NOMB_INGENIERO")%></td>
                 </tr>
@@ -100,7 +106,7 @@
                     <td>Brigada</td>
                     <td><img src='images/recurso.png'><%= rs.getString("NOMB_BRIGADA")%></td>
                 </tr>
-                <tr>
+                <tr class="odd">
                     <td>Campaña</td>
                     <td><%= rs.getString("CAMPDESC")%></td>
                 </tr>
@@ -108,7 +114,7 @@
                     <td>Zona</td>
                     <td><%= rs.getString("ZONANOMB")%></td>
                 </tr>
-                <tr>
+                <tr class="odd">
                     <td>Fecha Creación</td>
                     <td><img src='images/calendario.png'><%= rs.getString("FECHA_CARGA")%></td>
                 </tr>
@@ -116,7 +122,7 @@
                     <td>Usuario creador</td>
                     <td><img src='images/recurso.png'><%= rs.getString("USUARIO_CARGA")%></td>
                 </tr>
-                <tr>
+                <tr class="odd">
                     <td>Orden de Servicio</td>
                     <td><%= rs.getString("NUM_OS")%></td>
                 </tr>
@@ -134,7 +140,7 @@
                         <td>Direccion</td>
                         <td><%= rsSuministro.getString("DIRECCION")  %></td>
                     </tr>
-                    <tr>
+                    <tr class="odd">
                         <td>Municipio</td>
                         <td><%= rsSuministro.getString("MUNICIPIO")  %></td>
                         <td>Localidad</td>
@@ -151,6 +157,12 @@
             
             
             <% }  %>
+            
+            <h2>Fotos</h2>
+            <% int contador = 0; %>
+            <%  while (rsFotos.next()) {  %>
+                <img src='imagenes/<%= rsFotos.getString("filename") %>'>
+            <% } %>
             
         </div>
 

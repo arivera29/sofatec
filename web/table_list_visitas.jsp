@@ -1,3 +1,4 @@
+<%@page import="com.are.censo.controlador.CtlVisitas"%>
 <%@ page import="com.are.sofatec.*" %>
 
 <%
@@ -19,6 +20,13 @@
                 + " WHERE CONVERT(fecha_carga,DATE) BETWEEN ? AND ? ";
         
         
+        if (!tipo.equals("all")) {
+          sql += " AND tipo=" + tipo ;   
+        }
+        
+        if (!reporte.equals("all")){
+            sql += " AND estado_ejecucion=" + reporte;
+        }
         
         sql += " ORDER BY FECHA_CARGA";
 			
@@ -29,6 +37,8 @@
 	java.sql.ResultSet rs = conexion.Query(pst);
 	boolean rsIsEmpty = !rs.next();
 	int cont=0;
+        
+        CtlVisitas controlador = new CtlVisitas(conexion);
 	
 %>
 <table id="Exportar_a_Excel">
@@ -47,6 +57,7 @@
 		<th>REPORTE</th>
                 <th>ANOMALIA</th>
                 <th>ASIG</th>
+                <th>F</th>
 
 	</tr>
 	<% if (!rsIsEmpty) { 
@@ -110,16 +121,22 @@
                 </td>
 		<td><%= rs.getString("DESC_COD") %></td>
                 <td><%= rs.getString("RECUNOMB") %></td>
+                <td>
+                    <% long contador = controlador.ContadorPhoto(rs.getInt("id")); %>
+                    <%  if (contador > 0) {  %>
+                    <a href='javascript:consultarFoto(<%= rs.getString("id") %>)'><img src='images/buscar.png'></a>
+                    <% } %>
+                </td>
 	</tr>
 	<% 
 		cont++;
 	}while(rs.next()); %>
 	<tr>
-		<td colspan="14">Total de ordenes: <%= cont %></td>
+		<td colspan="15">Total de ordenes: <%= cont %></td>
 	</tr>
 	<% } else { %>
 	<tr>
-		<td colspan="14">No se encontraron registros</td>
+		<td colspan="15">No se encontraron registros</td>
 	</tr>	
 	
 	<% } %>

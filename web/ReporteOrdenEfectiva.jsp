@@ -1,3 +1,4 @@
+<%@page import="com.are.censo.controlador.CtlVisitas"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
          pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
@@ -44,6 +45,7 @@
         rsAparatosIsEmpty = !rsAparatos.next();
     }
     int fila = 0;
+    CtlVisitas ctlVisita = new CtlVisitas(conexion);
 %>
 <html>
     <head>
@@ -159,7 +161,10 @@
             <div class="orden">ORDEN DE SERVICIO <%=(String) request.getParameter("orden")%></div>
             <% if (rs.getInt("ESTADO_OPER") != 3 && usuario.getResolver() == 1) {%>
             <button class="boton" name="cmd_plantilla" id="cmd_plantilla" type="button" onclick="javascript:plantilla('<%= rs.getString("NUM_OS")%>', '<%= rs.getString("TIP_OS")%>')">Cargar Plantilla</button>
-            <button class="boton" name="cmd_plantilla" id="cmd_plantilla" type="button" onclick="javascript:ventanaCenso('<%= rs.getString("NUM_OS")%>', '<%= rs.getString("TIP_OS")%>')">Censo</button>
+            <button class="boton" name="cmd_censo" id="cmd_censo" type="button" onclick="javascript:ventanaCenso('<%= rs.getString("NUM_OS")%>', '<%= rs.getString("TIP_OS")%>')">Censo</button>
+            <% if (ctlVisita.isOrdenCenso(orden)) {  %>
+                <a class="boton" href ="SrvGenerateActaCenso?orden=<%= rs.getString("NUM_OS")  %>">Acta Censo</a>
+            <% }  %>
             <% }  %>
             <div id="info"></div>
             <% if (!rsIsEmpty) {%>

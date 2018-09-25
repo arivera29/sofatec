@@ -5,6 +5,7 @@
  */
 package com.are.servlet;
 
+import com.are.censo.controlador.CtlVisitas;
 import com.are.sofatec.db;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,8 +22,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author aimerrivera
  */
-@WebServlet(name = "SrvAlertaSuministro", urlPatterns = {"/SrvAlertaSuministro"})
-public class SrvAlertaSuministro extends HttpServlet {
+@WebServlet(name = "SrvVisitas", urlPatterns = {"/SrvVisitas"})
+public class SrvVisitas extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,42 +38,70 @@ public class SrvAlertaSuministro extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
+            String operacion = (String) request.getParameter("operacion");
 
-            String nic = (String)request.getParameter("nic");
             db conexion = null;
 
             try {
-                conexion = new db();
-                String sql = "SELECT NUM_OS, DATE(FECHA_GEN_OS) FECHA_GEN_OS FROM camp_orden "
-                        + " WHERE NIC=? "
-                        + "AND DATEDIFF( CURRENT_DATE( ) , DATE( FECHA_GEN_OS ) )  <= 40 "
-                        + "ORDER BY FECHA_GEN_OS DESC "
-                        + "LIMIT 1";
-                        
-                java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
-                pst.setString(1, nic);
-                java.sql.ResultSet rs = conexion.Query(pst);
-                if (rs.next()) {
-                    out.print("Este nic presenta una OS generada antes de 40 días: OS:" + rs.getString("NUM_OS") + " fecha:" + rs.getString("FECHA_CARGA"));
+
+                if (operacion.equals("all")) {
+                    conexion = new db();
+                    CtlVisitas controlador = new CtlVisitas(conexion);
+                    if (controlador.removeAllVisitas()) {
+                        out.print("OK");
+                    }else {
+                        out.print("Error al eliminar las visitas");
+                    }
                 }
-                        
-                        
-            } catch (SQLException ex) {
-                Logger.getLogger(SrvAlertaSuministro.class.getName()).log(Level.SEVERE, null, ex);
-                out.print("Error: " + ex.getMessage());
-            } finally {
+
+                if (operacion.equals("brigada")) {
+                    String brigada = (String)request.getParameter("brigada");
+                    conexion = new db();
+                    CtlVisitas controlador = new CtlVisitas(conexion);
+                    if (controlador.removeVisitaByBrigada(brigada)) {
+                        out.print("OK");
+                    }else {
+                        out.print("Error al eliminar las visitas de la brigada " + brigada);
+                    }
+
+                }
+
+                if (operacion.equals("one")) {
+                    String id = (String)request.getParameter("id");
+                    conexion = new db();
+                    CtlVisitas controlador = new CtlVisitas(conexion);
+                    if (controlador.removeVisitaById(Integer.parseInt(id))) {
+                        out.print("OK");
+                    }else {
+                        out.print("Error al eliminar la visita ID " + id);
+                    }
+
+                }
                 
+                if (operacion.equals("reasignar")) {
+                    String brigada_old = (String)request.getParameter("brigada_old");
+                    String brigada_new = (String)request.getParameter("brigada_new");
+                    conexion = new db();
+                    CtlVisitas controlador = new CtlVisitas(conexion);
+                    if (controlador.reasignar(brigada_old, brigada_new)) {
+                        out.print("OK");
+                    }else {
+                        out.print("Error al transferir visitas.");
+                    }
+
+                }
+
+            } catch (SQLException ex) {
+                Logger.getLogger(SrvVisitas.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
                 if (conexion != null) {
                     try {
                         conexion.Close();
                     } catch (SQLException ex) {
-                        Logger.getLogger(SrvAlertaSuministro.class.getName()).log(Level.SEVERE, null, ex);
-                        out.print("Error: " + ex.getMessage());
+                        Logger.getLogger(SrvVisitas.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                
             }
-
         }
     }
 

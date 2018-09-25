@@ -306,5 +306,90 @@ public class CtlVisitas {
         return result;
     }
     
+    public boolean isOrdenCenso(String orden) throws SQLException {
+        boolean result = false;
+        String sql = "SELECT DISTINCT NUM_OS FROM QO_CENSO WHERE NUM_OS=?";
+        java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
+        pst.setString(1, orden);
+        java.sql.ResultSet rs = conexion.Query(pst);
+        if (rs.next()) {
+            result = true;
+        }
+        rs.close();
+        
+        return false;
+    }
+    
+    
+    public boolean removeAllVisitas() throws SQLException {
+        String sql = "DELETE FROM visitas WHERE estado = 1";
+        if (conexion.Update(sql) >= 0) {
+            conexion.Commit();
+        }
+        return true;
+    }
+    
+    public boolean removeVisitaById(int id) throws SQLException {
+        String sql = "DELETE FROM visitas WHERE estado=1 AND id=?";
+        java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
+        pst.setInt(1, id);
+        
+        if (conexion.Update(pst) > 0) {
+            conexion.Commit();
+            return true;
+        } else {
+            return false;
+        }
+        
+        
+       
+    }
+    
+    public boolean removeVisitaByBrigada(String id) throws SQLException {
+        String sql = "DELETE FROM visitas WHERE estado=1 AND brigada=?";
+        java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
+        pst.setString(1, id);
+        
+        if (conexion.Update(pst) > 0) {
+            conexion.Commit();
+            return true;
+        } else {
+            return false;
+        }
+        
+        
+       
+    }
+    
+    public boolean reasignar(String brigada_old, String brigada_new) throws SQLException {
+        String sql = "UPDATE visitas SET brigada=? where brigada=? and estado=1";
+        java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
+        pst.setString(1, brigada_new);
+        pst.setString(1, brigada_old);
+        
+        if (conexion.Update(pst) > 0) {
+            conexion.Commit();
+            return true;
+        } else {
+            return false;
+        }
+        
+        
+       
+    }
+    
+    public long ContadorPhoto(int id) throws SQLException {
+        long contador = 0;
+        String sql = "SELECT count(*) as total FROM camp_orden_fotos WHERE id_orden=? AND visita=1";
+        java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
+        pst.setInt(1, id);
+        java.sql.ResultSet rs = conexion.Query(pst);
+        if (rs.next()) {
+            contador = rs.getLong("total");
+        }
+        
+        return contador;
+    }
+    
 
 }
