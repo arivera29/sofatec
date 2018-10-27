@@ -5,8 +5,6 @@
  */
 package com.are.servlet;
 
-import com.are.entidades.Camp;
-import com.are.manejadores.ManejadorCamp;
 import com.are.sofatec.db;
 import com.csvreader.CsvReader;
 import java.io.File;
