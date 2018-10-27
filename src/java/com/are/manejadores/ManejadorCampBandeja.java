@@ -238,15 +238,15 @@ public class ManejadorCampBandeja {
         return cont;
     }
     
-    public boolean Transferir(int source, int destination) throws SQLException {
+    public boolean Transferir(String source, String destination) throws SQLException {
         boolean result = false;
         String sql = "UPDATE camp_orden "
                 + " SET USUARIO_CARGA =? "
                 + " WHERE USUARIO_CARGA=? "
-                + " AND NUM_OS=?";
+                + " AND NUM_OS=''";
         java.sql.PreparedStatement pst = conexion.getConnection().prepareStatement(sql);
-        pst.setInt(1, destination);
-        pst.setInt(2, source);
+        pst.setString(1, destination);
+        pst.setString(2, source);
         
         if (conexion.Update(pst) > 0) {
             conexion.Commit();

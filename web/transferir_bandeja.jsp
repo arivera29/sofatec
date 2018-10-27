@@ -59,7 +59,7 @@
                             alert("Registros transferidos correctamente");
                             cancelar();
                         } else {
-                            $("#info").html("<img src='images/error.png'> " + data);
+                            $("#info").html("<img src='images/alerta.gif'> " + data);
                             $("#cmd_transferir").prop('disabled', false);
                         }
 
@@ -75,7 +75,7 @@
 
         </script>
     </head>
-    <body onload="list()">
+    <body>
         <%@ include file="header.jsp" %>
         <div class="contencenter demo">
             <H2>Registro de Bandejas</H2>
@@ -111,10 +111,10 @@
                     <tr>
                         <td>Usuario</td>
                         <td>
-                            <select name="usuario" id="usuario">
+                            <select name="bandeja" id="bandeja">
                                 <option value="">Seleccionar</option>
                                 <% for (CampBandeja temp : lista) {%>
-                                <option value="<%= temp.getId()%>"><%= temp.getUsuario()%></option>
+                                <option value="<%= temp.getUsuario() %>"><%= temp.getUsuario()%></option>
                                 <% }%>
 
                             </select>
@@ -124,7 +124,7 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <input type="button" onclick="javascript:transferir(<%= (String) request.getParameter("id")%>);" value="Transferir" id="cmd_transferir" name="cmd_transferir"  >
+                            <input type="button" onclick="javascript:transferir('<%= bandeja.getUsuario() %>');" value="Transferir" id="cmd_transferir" name="cmd_transferir"  >
                         </td>
                     </tr>
                 </table>

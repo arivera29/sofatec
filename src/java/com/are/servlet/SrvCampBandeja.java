@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -26,6 +28,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "SrvCampBandeja", urlPatterns = {"/SrvCampBandeja"})
 public class SrvCampBandeja extends HttpServlet {
+
+    private final static Logger LOGGER = Logger.getLogger(SrvCampBandeja.class.getName());
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -290,7 +294,7 @@ public class SrvCampBandeja extends HttpServlet {
 
                 ManejadorCampBandeja manejador = new ManejadorCampBandeja(conexion);
 
-                if (manejador.Transferir(Integer.parseInt(source),Integer.parseInt(destination))) {
+                if (manejador.Transferir(source,destination)) {
                     out.print("OK");
                 } else {
                     out.print("Error al procesar la solicitud");
@@ -303,13 +307,16 @@ public class SrvCampBandeja extends HttpServlet {
             // TODO Auto-generated catch block
             if (e.getErrorCode() == 1062) {  // Duplicidad de indice
                 out.print("Error de duplicidad del registro");
+                LOGGER.log(Level.SEVERE, e.getMessage());
             }else {
                 out.print("Error BD: " + e.getMessage() + ". Err Nro: " + e.getErrorCode());
+                LOGGER.log(Level.SEVERE, e.getMessage());
             }
             
         } catch (Exception e) {
             // TODO Auto-generated catch block
             out.print("Error:  " + e.getMessage());
+            LOGGER.log(Level.SEVERE, e.getMessage());
         } finally {
             if (conexion != null) {
                 try {

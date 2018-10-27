@@ -1,3 +1,4 @@
+<%@page import="com.are.censo.controlador.CtlVisitas"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@ include file="validausuario.jsp"%>
@@ -72,6 +73,8 @@
 	sql = "SELECT COD,DESC_COD FROM QO_ANOM WHERE COD != '-1' ORDER BY COD";
 	pst = conexion.getConnection().prepareStatement(sql);
 	ResultSet rsAnomalia = conexion.Query(pst);
+        
+        CtlVisitas ctlVisita = new CtlVisitas(conexion);
 	
 	int fila = 0;
 	
@@ -250,6 +253,9 @@ function Anomalia(orden) {
 	<%@ include file="header.jsp"%>
 	<div class="contencenter demo">
 		<h2>INFORMACION DE ORDEN DE SERVICIO <%= (String)request.getParameter("orden") %></h2>
+                <% if (ctlVisita.isOrdenCenso((String)request.getParameter("orden"))) {  %>
+                <a class="boton" href ="SrvGenerateActaCenso?orden=<%= (String)request.getParameter("orden")  %>">Acta Censo</a>
+                <% }  %>
 		<div id="info"></div>
 			<table>
 				<tr>

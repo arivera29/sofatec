@@ -205,6 +205,7 @@
         <%@ include file="header.jsp" %>
         <div class="contencenter demo">
             <h2>GENERAR ORDEN DE SERVICIO</h2>
+            <a href="importar_ordenes_camp.jsp">Importar Archivo</a>
             <div id="info"></div>
             <form action="" name="form1" id="form1">
                 <table>

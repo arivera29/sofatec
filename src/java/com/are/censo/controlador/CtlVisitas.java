@@ -317,7 +317,7 @@ public class CtlVisitas {
         }
         rs.close();
         
-        return false;
+        return result;
     }
     
     
